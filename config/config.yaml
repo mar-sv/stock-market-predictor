@@ -1,0 +1,56 @@
+# ---------------------------------------------------------------------------
+# Stock market predictor configuration
+# ---------------------------------------------------------------------------
+
+data:
+  # One should be the S&P 500 index (^GSPC); the rest are large-caps.
+  tickers: ["^GSPC", "AAPL", "MSFT"]
+  start: "2005-01-01"
+  end: null            # null -> up to today
+  interval: "1d"
+  cache_dir: "data/raw"
+
+# Forecasting setup -----------------------------------------------------------
+forecast:
+  lookback: 60         # number of past trading days fed to the model
+  horizon: 5           # predict the next 5 trading days (multi-horizon)
+  quantiles: [0.1, 0.5, 0.9]   # q50 = point forecast; direction = sign(q50)
+
+# Feature engineering ---------------------------------------------------------
+features:
+  # Past covariates derived from OHLCV (computed in data/features.py).
+  use_rsi: true
+  use_macd: true
+  use_volatility: true
+  use_ma_ratios: true
+  volatility_window: 20
+  rsi_window: 14
+  # Future-known covariates the TFT can exploit.
+  use_calendar: true
+
+# Chronological split (fractions of the full series, in time order) -----------
+split:
+  train: 0.7
+  val: 0.15
+  test: 0.15
+
+# Training --------------------------------------------------------------------
+train:
+  max_epochs: 50
+  early_stopping_patience: 8
+  accelerator: "auto"   # "cpu" / "gpu" / "auto"
+  num_workers: 0        # 0 is safest on Windows
+  seed: 42
+
+# Hyperparameter search -------------------------------------------------------
+optuna:
+  n_trials: 25
+  timeout: null         # seconds; null = no timeout
+  # Architectures explored per ticker; best validation metric wins.
+  architectures: ["tcn", "lstm", "tft"]
+  direction: "minimize" # we minimize the validation quantile loss
+
+# Experiment tracking ---------------------------------------------------------
+mlflow:
+  tracking_uri: "./mlruns"
+  experiment_prefix: "smp"   # experiment name -> "smp/<ticker>"

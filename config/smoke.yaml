@@ -1,0 +1,43 @@
+# Fast smoke-test config: 1 ticker, tiny search, few epochs.
+data:
+  tickers: ["AAPL"]
+  start: "2015-01-01"
+  end: "2023-01-01"
+  interval: "1d"
+  cache_dir: "data/raw"
+
+forecast:
+  lookback: 40
+  horizon: 5
+  quantiles: [0.1, 0.5, 0.9]
+
+features:
+  use_rsi: true
+  use_macd: true
+  use_volatility: true
+  use_ma_ratios: true
+  volatility_window: 20
+  rsi_window: 14
+  use_calendar: true
+
+split:
+  train: 0.7
+  val: 0.15
+  test: 0.15
+
+train:
+  max_epochs: 2
+  early_stopping_patience: 2
+  accelerator: "cpu"
+  num_workers: 0
+  seed: 42
+
+optuna:
+  n_trials: 2
+  timeout: null
+  architectures: ["tcn", "lstm", "tft"]
+  direction: "minimize"
+
+mlflow:
+  tracking_uri: "./mlruns"
+  experiment_prefix: "smp-smoke"

@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Project data & experiment outputs
+data/
+mlruns/
+mlartifacts/
+lightning_logs/
+optuna_studies/
+*.ckpt
+*.parquet
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
